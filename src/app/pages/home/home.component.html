@@ -1,0 +1,31 @@
+<div class="content-container">
+    <div class="instrument-sub">
+        <form [formGroup]="subscriptionForm" (ngSubmit)="onSubmit()">
+            <input formControlName="subscription" type="text" />
+            <button type="submit" [disabled]="!subscriptionForm.valid">Subscribe</button>
+        </form>
+    </div>
+    <div class="market-data">
+        <div class="title">Market data:</div>
+        <div class="value">
+            <div class="value__symbol">
+                <span>Symbol:</span>
+                <span>test</span>
+            </div>
+            <div class="value__price">
+                <span>Price:</span>
+                <span>test</span>
+            </div>
+            <div class="value__time">
+                <span>Time:</span>
+                <span>test</span>
+            </div>
+        </div>
+    </div>
+    <div class="charting-data">
+        <div class="title">Charting data:</div>
+        <div class="feature-graph">
+            Here will be awesome graph...
+        </div>
+    </div>
+</div>

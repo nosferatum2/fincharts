@@ -49,18 +49,49 @@
                   "maximumError": "4kB"
                 }
               ],
+              "assets": [
+                "src/favicon.ico",
+                {
+                  "input": "src/assets",
+                  "output": "/assets",
+                  "glob": "**/*",
+                  "ignore": ["**/*.yaml"]
+                },
+                {
+                  "input": "src/assets/environments/production",
+                  "output": "/assets/environments",
+                  "glob": "**/*"
+                }
+              ],
               "outputHashing": "all"
             },
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "assets": [
+                "src/favicon.ico",
+                {
+                  "input": "src/assets",
+                  "output": "/assets",
+                  "glob": "**/*",
+                  "ignore": ["**/*.yaml"]
+                },
+                {
+                  "input": "src/assets/environments/production",
+                  "output": "/assets/environments",
+                  "glob": "**/*"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "proxyConfig": "proxy.config.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "fintacharts:build:production"
