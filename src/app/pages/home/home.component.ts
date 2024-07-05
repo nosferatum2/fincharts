@@ -3,10 +3,9 @@ import { RouterOutlet } from '@angular/router';
 import { WebsocketService } from '@core/services/websocket/websocket.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { InstrumentsDataPageView } from '@core/services/api-service/models/instruments-data-page-view';
-import { ApiService } from '@core/services/api-service/api.service';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { InstrumentsService } from '@shared/services/instruments/instruments.service';
+import { InstrumentsDataPageView } from '@shared/services/instruments/models/instruments-data-page-view';
 
 // const marketDataRequest: MarketDataRequest = {
 //   type: 'l1-subscription',
@@ -17,16 +16,12 @@ import { AsyncPipe, JsonPipe } from '@angular/common';
 //   kinds: ['ask', 'bid', 'last']
 // };
 
-export const INSTRUMENTS_URL = '/api/instruments/v1/instruments?provider=oanda&kind=forex';
-
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [
     RouterOutlet,
     ReactiveFormsModule,
-    JsonPipe,
-    AsyncPipe
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss'
@@ -46,22 +41,23 @@ export class HomeComponent implements OnInit {
   constructor(
     private websocketService: WebsocketService,
     private formBuilder: FormBuilder,
-    private apiService: ApiService
+    private instrumentsService: InstrumentsService
   ) {
-    this.instruments$ = this.apiService.doGetRequest<InstrumentsDataPageView>(INSTRUMENTS_URL);
   }
 
   ngOnInit() {
     this.marketStream$ = this.websocketService.getMessages()
       .pipe(takeUntilDestroyed(this.destroyRef));
 
-    // this.instruments$.subscribe(console.log);
+    this.instruments$ = this.instrumentsService.getInstruments();
+
+    this.instruments$.subscribe(console.log);
   }
 
   onSubmit() {
     if (this.subscriptionForm.valid) {
       console.log(this.subscriptionForm.value);
-      this.apiService.doGetRequest(INSTRUMENTS_URL).subscribe();
+      // this.apiService.doGetRequest(INSTRUMENTS_URL).subscribe();
 
       // this.websocketService.sendMessage(marketDataRequest);
     }
