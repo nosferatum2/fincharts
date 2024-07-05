@@ -1,4 +1,4 @@
-import { ProviderType } from '@core/services/api-service/models/list-providers-data-view';
+import { ProviderType } from '@shared/services/instruments/models/providers-data-view';
 
 export type PriceType = 'ask' | 'bid' | 'last';
 
