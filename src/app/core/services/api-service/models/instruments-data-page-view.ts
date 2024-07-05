@@ -31,7 +31,7 @@ export interface InstrumentDataView {
   }
 }
 
-export interface InstrumentsDataView {
+export interface InstrumentsDataPageView {
   paging: Paging
   data: InstrumentDataView[]
 }
