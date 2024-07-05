@@ -1,36 +1,26 @@
 import { inject, Injectable } from '@angular/core';
 import { AnonymousSubject } from 'rxjs/internal/Subject';
-import { map, Observable, Observer, Subject, Subscription, switchMap } from 'rxjs';
-import { ApiService } from '@core/services/api-service/api.service';
-import { AccessDataView } from '@core/services/api-service/models/access-data-view';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { HttpHeaders, HttpParams } from '@angular/common/http';
-
-const headers = new HttpHeaders()
-  .set('Content-Type', 'application/x-www-form-urlencoded');
-
-const params = new HttpParams()
-  .set('grant_type', 'password')
-  .set('client_id', 'app-cli')
-  .set('username', 'r_test@fintatech.com')
-  .set('password', 'kisfiz-vUnvy9-sopnyv');
+import { Observable, Observer, Subject, Subscription } from 'rxjs';
+import { LocalStorageService } from '@core/services/local-storage/local-storage.service';
 
 const MAX_RETRY_COUNT = 5;
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class WebsocketService {
 
   private ws: WebSocket;
 
   private messages$: Subject<any> = new Subject<any>();
 
-  private tokenURL: string = '/identity/realms/fintatech/protocol/openid-connect/token';
-
   private wsURL: string = 'wss://platform.fintacharts.com/api/streaming/ws/v1/realtime';
 
-  private connection$: AnonymousSubject<MessageEvent<any>>;
+  private connection$: Observer<MessageEvent>;
 
-  private apiService = inject(ApiService);
+  private connectionSubscription: Subscription;
+
+  private localStorageService = inject(LocalStorageService);
 
   constructor() {
     this.connect();
@@ -42,21 +32,16 @@ export class WebsocketService {
   }
 
   private connect(attempt: number = 0) {
-    this.apiService.doPostRequest<AccessDataView>(
-      this.tokenURL,
-      params.toString(),
-      { headers, observe: 'body' }
-    )
-      .pipe(
-        switchMap(data => {
-          return this.createConnection(this.wsURL, data.access_token, attempt);
-        }),
-        map((response: MessageEvent) => {
-          this.messages$.next(JSON.parse(response.data) as any);
-        }),
-        takeUntilDestroyed()
-      )
-      .subscribe();
+    let accessToken = this.localStorageService.getItem('access_token');
+
+    if (!accessToken) {
+      return;
+    }
+
+    this.connectionSubscription = this.createConnection(this.wsURL, JSON.parse(accessToken), attempt)
+      .subscribe((response: MessageEvent) => {
+        this.messages$.next(JSON.parse(response.data) as any);
+      });
   }
 
   private createConnection(url: string, token: string, attempt: number): AnonymousSubject<MessageEvent> {
@@ -67,13 +52,15 @@ export class WebsocketService {
       this.ws.onclose = obs.complete.bind(obs);
       return this.ws.close.bind(this.ws);
     });
-    const observer = {
+    this.connection$ = {
       error: () => {
+        this.connectionSubscription.unsubscribe();
         if (attempt < MAX_RETRY_COUNT) {
           this.connect(attempt + 1);
         }
       },
       complete: () => {
+        this.connectionSubscription.unsubscribe();
         if (attempt < MAX_RETRY_COUNT) {
           this.connect(attempt + 1);
         }
@@ -85,8 +72,7 @@ export class WebsocketService {
       },
     };
 
-    this.connection$ = new AnonymousSubject<MessageEvent>(observer, observable);
-    return this.connection$;
+    return new AnonymousSubject<MessageEvent>(this.connection$, observable);
   }
 
   public disconnect(): any {
