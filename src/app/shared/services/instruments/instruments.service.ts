@@ -10,7 +10,7 @@ const instrumentsApi = {
   instruments: `${BASE_INSTRUMENTS_PATH}/instruments`,
   providers: `${BASE_INSTRUMENTS_PATH}/providers`,
   exchanges: `${BASE_INSTRUMENTS_PATH}/exchanges`
-}
+};
 
 @Injectable({
   providedIn: 'root'
@@ -30,4 +30,5 @@ export class InstrumentsService {
   getExchanges(params?: any) {
     return this.apiService.doGetRequest<ExchangesDataView>(instrumentsApi.exchanges, params);
   }
+
 }
