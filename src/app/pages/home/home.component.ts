@@ -7,6 +7,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { InstrumentsService } from '@shared/services/instruments/instruments.service';
 import { InstrumentsDataPageView } from '@shared/services/instruments/models/instruments-data-page-view';
 import { BarsService } from '@shared/services/bars/bars.service';
+import { BarChartComponent } from '@shared/components/bar-chart/bar-chart.component';
 
 // const marketDataRequest: MarketDataRequest = {
 //   type: 'l1-subscription',
@@ -23,6 +24,7 @@ import { BarsService } from '@shared/services/bars/bars.service';
   imports: [
     RouterOutlet,
     ReactiveFormsModule,
+    BarChartComponent,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',

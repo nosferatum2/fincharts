@@ -6,6 +6,10 @@ import { HTTP_INTERCEPTORS, provideHttpClient, withFetch, withInterceptorsFromDi
 import { AuthInterceptor } from '@core/auth/interceptors/auth.interceptor';
 import { AuthService } from '@core/auth/services/auth.service';
 import { initializeAuth } from '@core/auth/services/initialize-auth';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
+import { CandlestickController, CandlestickElement } from 'chartjs-chart-financial';
+import { StreamingPlugin } from 'chartjs-plugin-streaming';
+import 'chartjs-adapter-luxon'; // Need for provide date adapter
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,6 +19,11 @@ export const appConfig: ApplicationConfig = {
       withFetch(),
       withInterceptorsFromDi(),
     ),
+    provideCharts(withDefaultRegisterables([
+      CandlestickController,
+      CandlestickElement,
+      StreamingPlugin
+    ])),
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
