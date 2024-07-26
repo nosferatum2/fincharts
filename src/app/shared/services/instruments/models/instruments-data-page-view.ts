@@ -4,7 +4,7 @@ export type ProviderDataView = {
   [key in ProviderType]: ProviderMappingItem;
 };
 
-export interface Paging {
+export interface PagingDataView {
   page: number;
   pages: number;
   items: number;
@@ -28,6 +28,6 @@ export interface InstrumentDataView {
 }
 
 export interface InstrumentsDataPageView {
-  paging: Paging
+  paging: PagingDataView
   data: InstrumentDataView[]
 }
