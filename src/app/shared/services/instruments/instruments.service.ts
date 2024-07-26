@@ -3,6 +3,7 @@ import { ApiService } from '@core/services/api-service/api.service';
 import { InstrumentsDataPageView } from '@shared/services/instruments/models/instruments-data-page-view';
 import { ProvidersDataView } from '@shared/services/instruments/models/providers-data-view';
 import { ExchangesDataView } from '@shared/services/instruments/models/exchanges-data-view';
+import { ExchangesQuery } from '@shared/services/instruments/queries/queries';
 
 const BASE_INSTRUMENTS_PATH = '/api/instruments/v1';
 
@@ -23,11 +24,11 @@ export class InstrumentsService {
     return this.apiService.doGetRequest<InstrumentsDataPageView>(instrumentsApi.instruments, params);
   }
 
-  getProviders(params?: any) {
-    return this.apiService.doGetRequest<ProvidersDataView>(instrumentsApi.providers, params);
+  getProviders() {
+    return this.apiService.doGetRequest<ProvidersDataView>(instrumentsApi.providers);
   }
 
-  getExchanges(params?: any) {
+  getExchanges(params?: ExchangesQuery) {
     return this.apiService.doGetRequest<ExchangesDataView>(instrumentsApi.exchanges, params);
   }
 

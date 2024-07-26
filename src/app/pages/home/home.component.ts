@@ -8,6 +8,9 @@ import { InstrumentsService } from '@shared/services/instruments/instruments.ser
 import { InstrumentsDataPageView } from '@shared/services/instruments/models/instruments-data-page-view';
 import { BarsService } from '@shared/services/bars/bars.service';
 import { BarChartComponent } from '@shared/components/bar-chart/bar-chart.component';
+import { ExchangesDataView } from '@shared/services/instruments/models/exchanges-data-view';
+import { ExchangesQuery, InstrumentsQueryBuilder } from '@shared/services/instruments/queries/queries';
+import { BarsQueryBuilder, CountBackQuery } from '@shared/services/bars/queries/queries';
 
 // const marketDataRequest: MarketDataRequest = {
 //   type: 'l1-subscription',
@@ -38,10 +41,24 @@ export class HomeComponent implements OnInit {
 
   instruments$: Observable<InstrumentsDataPageView>;
 
+  exchanges$: Observable<ExchangesDataView>;
+
   bars$: Observable<any>;
 
   subscriptionForm: FormGroup = this.formBuilder.group({
     subscription: ['', Validators.required]
+  });
+
+  instrumentsQueryBuilder: InstrumentsQueryBuilder = new InstrumentsQueryBuilder();
+
+  exchangeQueryBuilder: ExchangesQuery = new ExchangesQuery();
+
+  countBackQueryBuilder = new BarsQueryBuilder<CountBackQuery>({
+    instrumentId: 'ad9e5345-4c3b-41fc-9437-1d253f62db52',
+    provider: 'oanda',
+    interval: 1,
+    periodicity: 'hour',
+    barsCount: 20
   });
 
   private destroyRef = inject(DestroyRef);
@@ -58,38 +75,17 @@ export class HomeComponent implements OnInit {
     this.marketStream$ = this.websocketService.getMessages()
       .pipe(takeUntilDestroyed(this.destroyRef));
 
-    this.instruments$ = this.instrumentsService.getInstruments();
+    this.instruments$ = this.instrumentsService.getInstruments(
+      this.instrumentsQueryBuilder
+        .withPaging(1, 10)
+    );
     // this.instruments$.subscribe(console.log);
 
-    // bars count back
-    this.bars$ = this.barsService.getCountBack({
-      instrumentId: 'ad9e5345-4c3b-41fc-9437-1d253f62db52',
-      provider: 'oanda',
-      interval: 1,
-      periodicity: 'minute',
-      barsCount: 10
-    });
-
-    // bars date range
-    // this.bars$ = this.barsService.getDateRange({
-    //   instrumentId: 'ad9e5345-4c3b-41fc-9437-1d253f62db52',
-    //   provider: 'oanda',
-    //   interval: 1,
-    //   periodicity: 'hour',
-    //   startDate: '2023-09-07',
-    //   endDate: '2023-09-30'
-    // });
-
-    // bars time back
-    // this.bars$ = this.barsService.getTimeBack({
-    //   // instrumentId: 'ad9e5345-4c3b-41fc-9437-1d253f62db52',
-    //   // provider: 'oanda',
-    //   // interval: 1,
-    //   // periodicity: 'minute',
-    //   // timeBack: '1.00:00:00',
-    // });
-
+    this.bars$ = this.barsService.getCountBack(this.countBackQueryBuilder.build());
     this.bars$.subscribe(console.log);
+
+    this.exchanges$ = this.instrumentsService.getExchanges(this.exchangeQueryBuilder);
+    // this.exchanges$.subscribe(console.log);
   }
 
   onSubmit() {
