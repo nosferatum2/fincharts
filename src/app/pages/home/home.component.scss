@@ -10,25 +10,6 @@
   margin: 10px;
 }
 
-.instrument-sub {
-  width: 100%;
-
-  form {
-    display: flex;
-    align-items: center;
-  }
-
-  input {
-    width: 100%;
-    padding: 7px;
-    margin-right: 20px
-  }
-
-  button {
-    height: fit-content;
-  }
-}
-
 .market-data,
 .charting-data {
   display: flex;

@@ -1,0 +1,45 @@
+:host {
+  width: 100%;
+}
+
+form {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+input {
+  width: 100%;
+  padding: 7px;
+  margin-right: 20px
+}
+
+button {
+  height: fit-content;
+}
+
+.autocomplete-items {
+  position: absolute;
+  border: 1px solid #d4d4d4;
+  border-bottom: none;
+  border-top: none;
+  z-index: 99;
+  top: 100%;
+  left: 0;
+  right: 0;
+  width: 277px;
+  max-height: 312px;
+  overflow-y: auto;
+
+  &__option {
+    padding: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-bottom: 1px solid #d4d4d4;
+
+    &:hover {
+      background-color: #e9e9e9;
+    }
+  }
+
+}

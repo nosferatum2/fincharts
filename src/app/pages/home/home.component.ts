@@ -1,8 +1,7 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { WebsocketService } from '@core/services/websocket/websocket.service';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subscription } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { InstrumentsService } from '@shared/services/instruments/instruments.service';
 import { InstrumentsDataPageView } from '@shared/services/instruments/models/instruments-data-page-view';
@@ -11,6 +10,9 @@ import { BarChartComponent } from '@shared/components/bar-chart/bar-chart.compon
 import { ExchangesDataView } from '@shared/services/instruments/models/exchanges-data-view';
 import { ExchangesQuery, InstrumentsQueryBuilder } from '@shared/services/instruments/queries/queries';
 import { BarsQueryBuilder, CountBackQuery } from '@shared/services/bars/queries/queries';
+import { SubFormComponent } from '@pages/components/sub-form/sub-form.component';
+import { CurrencyOption } from '@pages/models/currency-options';
+import { AsyncPipe } from '@angular/common';
 
 // const marketDataRequest: MarketDataRequest = {
 //   type: 'l1-subscription',
@@ -26,8 +28,9 @@ import { BarsQueryBuilder, CountBackQuery } from '@shared/services/bars/queries/
   standalone: true,
   imports: [
     RouterOutlet,
-    ReactiveFormsModule,
     BarChartComponent,
+    SubFormComponent,
+    AsyncPipe,
   ],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -35,7 +38,7 @@ import { BarsQueryBuilder, CountBackQuery } from '@shared/services/bars/queries/
     BarsService
   ]
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
 
   marketStream$: Observable<any>;
 
@@ -45,9 +48,7 @@ export class HomeComponent implements OnInit {
 
   bars$: Observable<any>;
 
-  subscriptionForm: FormGroup = this.formBuilder.group({
-    subscription: ['', Validators.required]
-  });
+  currencyOptions$ = new BehaviorSubject<CurrencyOption[]>([]);
 
   instrumentsQueryBuilder: InstrumentsQueryBuilder = new InstrumentsQueryBuilder();
 
@@ -61,11 +62,12 @@ export class HomeComponent implements OnInit {
     barsCount: 20
   });
 
+  private subscription: Subscription;
+
   private destroyRef = inject(DestroyRef);
 
   constructor(
     private websocketService: WebsocketService,
-    private formBuilder: FormBuilder,
     private instrumentsService: InstrumentsService,
     private barsService: BarsService
   ) {
@@ -77,24 +79,44 @@ export class HomeComponent implements OnInit {
 
     this.instruments$ = this.instrumentsService.getInstruments(
       this.instrumentsQueryBuilder
-        .withPaging(1, 10)
     );
     // this.instruments$.subscribe(console.log);
 
     this.bars$ = this.barsService.getCountBack(this.countBackQueryBuilder.build());
-    this.bars$.subscribe(console.log);
+    // this.bars$.subscribe(console.log);
 
     this.exchanges$ = this.instrumentsService.getExchanges(this.exchangeQueryBuilder);
     // this.exchanges$.subscribe(console.log);
   }
 
-  onSubmit() {
-    if (this.subscriptionForm.valid) {
-      console.log(this.subscriptionForm.value);
-      // this.apiService.doGetRequest(INSTRUMENTS_URL).subscribe();
-
-      // this.websocketService.sendMessage(marketDataRequest);
+  public onInputChange(inputValue: string) {
+    if (inputValue.length > 0) {
+      this.subscription = this.instrumentsService.getInstruments(
+        this.instrumentsQueryBuilder.withSymbol(inputValue)
+      )
+        .subscribe((instruments: InstrumentsDataPageView) =>
+          this.currencyOptions$.next(this.transformInstruments(instruments))
+        );
+    } else {
+      this.currencyOptions$.next([]);
     }
+  }
+
+  public onSubmit(option: CurrencyOption | null) {
+    console.log(option);
+    return option;
+  }
+
+  private transformInstruments(instruments: InstrumentsDataPageView): CurrencyOption[] {
+    return instruments.data.map(instrument => ({
+      id: instrument.id,
+      value: instrument.symbol,
+      label: instrument.description
+    }));
+  }
+
+  ngOnDestroy() {
+    this.subscription?.unsubscribe();
   }
 
 }

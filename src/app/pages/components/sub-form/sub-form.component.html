@@ -1,0 +1,16 @@
+<form [formGroup]="subscriptionForm" (ngSubmit)="onSubmit()">
+    <input formControlName="symbolSub" type="text" />
+    <button type="submit" [disabled]="!subscriptionForm.valid">Subscribe</button>
+
+    <!-- we can also use some autocomplete from external libraries -->
+    @if (currencyOptions(); as options) {
+        <div class="autocomplete-items">
+            @for (option of options; track option.id) {
+                <div class="autocomplete-items__option" (click)="selectOption(option)">
+                    {{ option.label }}
+                </div>
+            }
+        </div>
+    }
+
+</form>
