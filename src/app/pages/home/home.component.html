@@ -1,10 +1,10 @@
 <div class="content-container">
-    <div class="instrument-sub">
-        <form [formGroup]="subscriptionForm" (ngSubmit)="onSubmit()">
-            <input formControlName="subscription" type="text" />
-            <button type="submit" [disabled]="!subscriptionForm.valid">Subscribe</button>
-        </form>
-    </div>
+    <app-sub-form
+        [filterOptions]="(currencyOptions$ | async) || []"
+        (inputChanged)="onInputChange($event)"
+        (submitted)="onSubmit($event)"
+    >
+    </app-sub-form>
     <div class="market-data">
         <div class="title">Market data:</div>
         <div class="value">
