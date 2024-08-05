@@ -9,7 +9,7 @@ import { BarsService } from '@shared/services/bars/bars.service';
 import { BarChartComponent } from '@shared/components/bar-chart/bar-chart.component';
 import { ExchangesDataView } from '@shared/services/instruments/models/exchanges-data-view';
 import { ExchangesQuery, InstrumentsQueryBuilder } from '@shared/services/instruments/queries/queries';
-import { BarsQueryBuilder, CountBackQuery } from '@shared/services/bars/queries/queries';
+import { CountBackQuery } from '@shared/services/bars/queries/queries';
 import { SubFormComponent } from '@pages/components/sub-form/sub-form.component';
 import { CurrencyOption } from '@pages/models/currency-options';
 import { AsyncPipe } from '@angular/common';
@@ -54,13 +54,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   exchangeQueryBuilder: ExchangesQuery = new ExchangesQuery();
 
-  countBackQueryBuilder = new BarsQueryBuilder<CountBackQuery>({
-    instrumentId: 'ad9e5345-4c3b-41fc-9437-1d253f62db52',
-    provider: 'oanda',
-    interval: 1,
-    periodicity: 'hour',
-    barsCount: 20
-  });
+  countBackQueryBuilder = new CountBackQuery(
+    'ad9e5345-4c3b-41fc-9437-1d253f62db52',
+    'oanda',
+    1,
+    'hour',
+    20
+  );
 
   private subscription: Subscription;
 
@@ -82,7 +82,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
     // this.instruments$.subscribe(console.log);
 
-    this.bars$ = this.barsService.getCountBack(this.countBackQueryBuilder.build());
+    this.bars$ = this.barsService.getCountBack(this.countBackQueryBuilder);
     // this.bars$.subscribe(console.log);
 
     this.exchanges$ = this.instrumentsService.getExchanges(this.exchangeQueryBuilder);
