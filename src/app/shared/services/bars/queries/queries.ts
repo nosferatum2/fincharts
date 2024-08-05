@@ -34,6 +34,26 @@ abstract class BaseBarsQueryParams implements QueryParams {
     this.periodicity = periodicity;
   }
 
+  public withInstrumentId(instrumentId: string) {
+    this.instrumentId = instrumentId;
+    return this;
+  }
+
+  public withProvider(provider: ProviderType) {
+    this.provider = provider;
+    return this;
+  }
+
+  public withInterval(interval: number) {
+    this.interval = interval;
+    return this;
+  }
+
+  public withPeriodicity(periodicity: IntervalType) {
+    this.periodicity = periodicity;
+    return this;
+  }
+
 }
 
 /**
@@ -58,6 +78,11 @@ export class CountBackQuery extends BaseBarsQueryParams {
   ) {
     super(instrumentId, provider, interval, periodicity);
     this.barsCount = barsCount;
+  }
+
+  public withBarsCount(barsCount: number) {
+    this.barsCount = barsCount;
+    return this;
   }
 
 }
@@ -91,6 +116,16 @@ export class DateRangeQuery extends BaseBarsQueryParams {
     this.endDate = endDate;
   }
 
+  public withStartDate(startDate: string) {
+    this.startDate = startDate;
+    return this;
+  }
+
+  public withEndDate(endDate: string) {
+    this.endDate = endDate;
+    return this;
+  }
+
 }
 
 /**
@@ -117,122 +152,9 @@ export class TimeBackQuery extends BaseBarsQueryParams {
     this.timeBack = timeBack;
   }
 
-}
-
-export class BarsQueryBuilder<T extends BaseBarsQueryParams> {
-
-  protected instance: T;
-
-  constructor(
-    instance: T
-  ) {
-    this.createInstance(instance);
-  }
-
-  public withInstrumentId(instrumentId: string) {
-    this.instance.instrumentId = instrumentId;
-    return this;
-  }
-
-  public withProvider(provider: ProviderType) {
-    this.instance.provider = provider;
-    return this;
-  }
-
-  public withInterval(interval: number) {
-    this.instance.interval = interval;
-    return this;
-  }
-
-  public withPeriodicity(periodicity: IntervalType) {
-    this.instance.periodicity = periodicity;
-    return this;
-  }
-
-  public withBarsCount(barsCount: number) {
-    if (this.instance instanceof CountBackQuery) {
-      this.instance.barsCount = barsCount;
-      return this;
-    }
-
-    throw new Error('withBarsCount() can only be used with CountBackQuery');
-  }
-
-  public withStartDate(startDate: string) {
-    if (this.instance instanceof DateRangeQuery) {
-      this.instance.startDate = startDate;
-      return this;
-    }
-
-    throw Error('withStartDate() can only be used with DateRangeQuery');
-  }
-
-  public withEndDate(endDate: string) {
-    if (this.instance instanceof DateRangeQuery) {
-      this.instance.endDate = endDate;
-      return this;
-    }
-
-    throw Error('withEndDate() can only be used with DateRangeQuery');
-  }
-
   public withTimeBack(timeBack: string) {
-    if (this.instance instanceof TimeBackQuery) {
-      this.instance.timeBack = timeBack;
-      return this;
-    }
-
-    throw Error('withTimeBack() can only be used with TimeBackQuery');
-  }
-
-  public build(): T {
-    return this.instance;
-  }
-
-  private createInstance(query: QueryParams) {
-    const {
-      instrumentId,
-      provider,
-      interval,
-      periodicity,
-      barsCount,
-      startDate,
-      endDate,
-      timeBack
-    } = query;
-
-    switch (true) {
-      case barsCount !== undefined:
-        this.instance = new CountBackQuery(
-          instrumentId,
-          provider,
-          interval,
-          periodicity,
-          barsCount
-        ) as unknown as T;
-        break;
-      case startDate !== undefined && endDate !== undefined:
-        this.instance = new DateRangeQuery(
-          instrumentId,
-          provider,
-          interval,
-          periodicity,
-          startDate,
-          endDate
-        ) as unknown as T;
-        break;
-      case timeBack !== undefined:
-        this.instance = new TimeBackQuery(
-          instrumentId,
-          provider,
-          interval,
-          periodicity,
-          timeBack
-        ) as unknown as T;
-        break;
-      default:
-        throw new Error('Invalid parameters for query creation');
-    }
+    this.timeBack = timeBack;
+    return this;
   }
 
 }
