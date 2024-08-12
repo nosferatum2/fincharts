@@ -8,7 +8,7 @@ import { AuthService } from '@core/auth/services/auth.service';
 import { initializeAuth } from '@core/auth/services/initialize-auth';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { CandlestickController, CandlestickElement } from 'chartjs-chart-financial';
-import { StreamingPlugin } from 'chartjs-plugin-streaming';
+// import { StreamingPlugin } from 'chartjs-plugin-streaming';
 import 'chartjs-adapter-luxon'; // Need for provide date adapter
 
 export const appConfig: ApplicationConfig = {
@@ -22,7 +22,7 @@ export const appConfig: ApplicationConfig = {
     provideCharts(withDefaultRegisterables([
       CandlestickController,
       CandlestickElement,
-      StreamingPlugin
+      // StreamingPlugin
     ])),
     {
       provide: HTTP_INTERCEPTORS,
